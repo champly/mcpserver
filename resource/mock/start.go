@@ -26,13 +26,13 @@ func New(s types.Source) types.LogicServer {
 	vs.source = s
 	se.source = s
 
-	m.Registry(s)
+	m.Registry()
 	return m
 }
 
-func (m *mock) Registry(s types.Source) {
-	resource.Registry(types.IstioCRDEnvoyFilter, ef)
-	resource.Registry(types.IstioCRDVirtualService, vs)
+func (m *mock) Registry() {
+	// resource.Registry(types.IstioCRDEnvoyFilter, ef)
+	// resource.Registry(types.IstioCRDVirtualService, vs)
 	resource.Registry(types.IstioCRDServiceEntry, se)
 }
 
