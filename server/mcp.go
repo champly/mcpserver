@@ -111,6 +111,10 @@ func (h *sourceHarness) Watch(req *source.Request, pushResponse source.PushRespo
 	if err != nil {
 		klog.Fatalf("get all %s resource failed: %s", req.Collection, err)
 	}
+	if resp.Version == req.VersionInfo {
+		return nil
+	}
+
 	if resp != nil {
 		h.PushFunc(&source.WatchResponse{
 			Collection: req.Collection,
