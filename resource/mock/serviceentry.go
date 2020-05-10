@@ -10,8 +10,6 @@ import (
 	ptypes "github.com/gogo/protobuf/types"
 	mcp "istio.io/api/mcp/v1alpha1"
 	networking "istio.io/api/networking/v1alpha3"
-	"istio.io/istio/pkg/mcp/source"
-	"k8s.io/klog"
 )
 
 type mockserviceentry struct {
@@ -20,15 +18,11 @@ type mockserviceentry struct {
 	source types.Source
 }
 
-func (se *mockserviceentry) All(req *source.Request) (*types.ResourceSnap, error) {
+func (se *mockserviceentry) All() (*types.ResourceSnap, error) {
 	se.l.Lock()
 	defer se.l.Unlock()
 
 	if se.snap != nil {
-		if req.VersionInfo == se.snap.Version {
-			klog.Infof("mock resource %s confirm", req.Collection)
-			return nil, nil
-		}
 		return se.snap, nil
 	}
 

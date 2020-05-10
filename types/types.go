@@ -2,7 +2,6 @@ package types
 
 import (
 	mcp "istio.io/api/mcp/v1alpha1"
-	"istio.io/istio/pkg/mcp/source"
 )
 
 // Istio CRD string
@@ -19,7 +18,7 @@ type ResourceSnap struct {
 }
 
 type Snap interface {
-	All(req *source.Request) (*ResourceSnap, error)
+	All() (*ResourceSnap, error)
 }
 
 type Source interface {

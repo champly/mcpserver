@@ -89,11 +89,9 @@ func newSourceHarness() *sourceHarness {
 }
 
 func (h *sourceHarness) Watch(req *source.Request, pushResponse source.PushResponseFunc, peerAddr string) source.CancelWatchFunc {
-	once.Do(func() {
-		h.PushFunc = pushResponse
-	})
+	h.PushFunc = pushResponse
 
-	snap, ok := resource.FactorySnap[req.Collection]
+	snapHandler, ok := resource.FactorySnap[req.Collection]
 	if !ok {
 		if req.VersionInfo == defaultVersion {
 			klog.Infof("needless resource ack:%+v", req)
@@ -107,22 +105,25 @@ func (h *sourceHarness) Watch(req *source.Request, pushResponse source.PushRespo
 		return nil
 	}
 
-	resp, err := snap.All(req)
+	snap, err := snapHandler.All()
 	if err != nil {
 		klog.Fatalf("get all %s resource failed: %s", req.Collection, err)
 	}
-	if resp.Version == req.VersionInfo {
+
+	if snap == nil {
 		return nil
 	}
 
-	if resp != nil {
-		h.PushFunc(&source.WatchResponse{
-			Collection: req.Collection,
-			Version:    resp.Version,
-			Resources:  resp.Resources,
-			Request:    req,
-		})
+	if snap.Version == req.VersionInfo {
+		return nil
 	}
+
+	h.PushFunc(&source.WatchResponse{
+		Collection: req.Collection,
+		Version:    snap.Version,
+		Resources:  snap.Resources,
+		Request:    req,
+	})
 	return nil
 }
 

@@ -11,8 +11,6 @@ import (
 	ptypes "github.com/gogo/protobuf/types"
 	mcp "istio.io/api/mcp/v1alpha1"
 	networking "istio.io/api/networking/v1alpha3"
-	"istio.io/istio/pkg/mcp/source"
-	"k8s.io/klog"
 )
 
 type mockenvoyfilter struct {
@@ -21,15 +19,11 @@ type mockenvoyfilter struct {
 	source types.Source
 }
 
-func (ef *mockenvoyfilter) All(req *source.Request) (*types.ResourceSnap, error) {
+func (ef *mockenvoyfilter) All() (*types.ResourceSnap, error) {
 	ef.l.Lock()
 	defer ef.l.Unlock()
 
 	if ef.snap != nil {
-		if req.VersionInfo == ef.snap.Version {
-			klog.Infof("mock resource %s confirm", req.Collection)
-			return nil, nil
-		}
 		return ef.snap, nil
 	}
 
