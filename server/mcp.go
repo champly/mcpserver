@@ -2,13 +2,16 @@ package server
 
 import (
 	"fmt"
+	"math"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/champly/mcpserver/resource"
 	"github.com/champly/mcpserver/resource/mock"
 	"github.com/champly/mcpserver/types"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 	mcp "istio.io/api/mcp/v1alpha1"
 	"istio.io/istio/pkg/mcp/rate"
 	"istio.io/istio/pkg/mcp/server"
@@ -63,7 +66,7 @@ func (s *sinkServer) Start(stop <-chan struct{}) {
 	}
 	klog.Infoln("listen", addr)
 
-	serv := grpc.NewServer()
+	serv := grpc.NewServer(getServerGrpcOptions()...)
 	mcp.RegisterResourceSourceServer(serv, srv)
 
 	go func() {
@@ -136,4 +139,27 @@ func (h *sourceHarness) Push(collection string, snap *types.ResourceSnap) {
 		Version:    snap.Version,
 		Resources:  snap.Resources,
 	})
+}
+
+func getServerGrpcOptions() []grpc.ServerOption {
+	var grpcOptions []grpc.ServerOption
+	grpcOptions = append(grpcOptions,
+		grpc.MaxConcurrentStreams(uint32(1024)),
+		grpc.MaxRecvMsgSize(int(4*1024*1024)),
+		grpc.InitialWindowSize(int32(1024*1024)),
+		grpc.InitialConnWindowSize(int32(1024*1024)),
+		grpc.KeepaliveParams(keepalive.ServerParameters{
+			Time:                  30 * time.Second,
+			Timeout:               10 * time.Second,
+			MaxConnectionIdle:     time.Duration(math.MaxInt64),
+			MaxConnectionAgeGrace: 10 * time.Second,
+		}),
+		// Relax keepalive enforcement policy requirements to avoid dropping connections due to too many pings.
+		grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+			MinTime:             30 * time.Second,
+			PermitWithoutStream: true,
+		}),
+	)
+
+	return grpcOptions
 }
