@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/champly/lib4go v0.0.0-20200508051201-2cb0f4ccb079
 	github.com/gin-gonic/gin v1.8.1
-	github.com/gogo/protobuf v1.3.1
+	github.com/gogo/protobuf v1.3.2
 	google.golang.org/grpc v1.33.1
 	istio.io/api v0.0.0-20210419172736-4acdfb7450da
 	istio.io/istio v0.0.0-20210507004845-1aa9fc7a594d
