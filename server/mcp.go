@@ -17,7 +17,7 @@ import (
 	"istio.io/istio/pkg/mcp/server"
 	"istio.io/istio/pkg/mcp/source"
 	"istio.io/istio/pkg/mcp/testing/monitoring"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 )
 
 var (

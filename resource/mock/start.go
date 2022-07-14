@@ -6,9 +6,8 @@ import (
 
 	"github.com/champly/mcpserver/resource"
 	"github.com/champly/mcpserver/types"
-
 	"github.com/gin-gonic/gin"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 )
 
 var (
